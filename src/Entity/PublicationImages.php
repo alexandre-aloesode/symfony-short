@@ -27,6 +27,10 @@ class PublicationImages
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $title = null;
 
+    #[ORM\ManyToOne(inversedBy: 'publicationImages')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Publication $publication_id = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -76,6 +80,18 @@ class PublicationImages
     public function setTitle(?string $title): static
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function getPublicationId(): ?Publication
+    {
+        return $this->publication_id;
+    }
+
+    public function setPublicationId(?Publication $publication_id): static
+    {
+        $this->publication_id = $publication_id;
 
         return $this;
     }
