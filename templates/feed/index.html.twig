@@ -1,32 +1,35 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello FeedController!{% endblock %}
+{% block stylesheets %}
+	<link href="{{ asset('styles/feed.css') }}" rel="stylesheet"/>
+{% endblock %}
+
 
 {% block body %}
-{% include('/components/navbar.html.twig') %}
 
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    {{ form_start(newPublicationForm) }}
-        {{ form_row(newPublicationForm.title) }}
-        {{ form_row(newPublicationForm.content) }}
-        {# {{ form_row(newPublicationForm.url) }} #}
-        <button type="submit" class="btn">Add Publication</button>
-    {{ form_end(newPublicationForm) }}
-
-    {# {% for article in articles.articles %}
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ article.title }}</h5>
-                <p class="card-text">{{ article.description }}</p>
-                <a href="{{ article.url }}" class="btn btn-primary">Go somewhere</a>
-            </div>
-        </div>
-    {% endfor %} #}
-    {# how can I display the form I created to add a new article? #}
-</div>
+	{% include('/components/navbar.html.twig') %}
+	<div id="publications">
+		<div id="new_publication">
+			<button type="button" class="btn btn-primary">
+				<a href="/new_publication" style="color: white;">
+					New publication
+				</a>
+			</button>
+		</div>
+		<div id="feed_scroll">
+			{% for publication in allPublications %}
+				<div class="publication_card">
+					<div class="publication-body">
+						<h5 class="card-title">{{ publication.title }}</h5>
+						<p class="card-text">{{ publication.content }}</p>
+					</div>
+					<div class="publication_image_div">
+						<img src="{{ asset('images/publication_images/' ~ publication.publicationImages[0].image) }}" class="publication_image" alt="...">
+					</div>
+				</div>
+			{% endfor %}
+			<button type="button" class="btn btn-primary">Load more</button>
+		</div>
+	</div>
+	<div id="feed_suggestion"></div>
 {% endblock %}

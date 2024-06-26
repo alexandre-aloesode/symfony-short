@@ -9,6 +9,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Entity\Publication;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
 
 class CreatePublicationFormType extends AbstractType
 {
@@ -17,9 +19,23 @@ class CreatePublicationFormType extends AbstractType
         $builder
             ->add('title', TextType::class)
             ->add('content', TextType::class)
+            ->add('image', FileType::class, [
+                'label' => 'Image',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/*',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image document',
+                    ])
+                ]
+            ])
             // ->add('created_at', DateType::class)
             // ->add('url', TextType::class)
-            ->add('submit', SubmitType::class)
+            ->add('Submit', SubmitType::class)
         ;
     }
 

@@ -5,21 +5,44 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use APP\Third_Party\ArticleGetter;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Entity\Publication;
-use App\Entity\PublicationImages;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Controller\PublicationController;
 use App\Form\CreatePublicationFormType;
 use Symfony\Component\HttpFoundation\Request;
-
-
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use App\Entity\PublicationImages;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class FeedController extends AbstractController
 {
     #[Route('/feed', name: 'app_feed')]
+
+    public function getPublications(EntityManagerInterface $entityManager): Response
+    {
+
+        $publications = $entityManager->getRepository(Publication::class)->findAll();
+
+        foreach($publications as $publication){
+
+            // $publicationUser = $publication->getUserId();
+            // $publication->setUserId($publicationUser->getUsername());
+            
+            $publicationImages = $entityManager->getRepository(PublicationImages::class)->findBy(['publication' => $publication->getId()]);
+           if($publicationImages){
+               $collection = new ArrayCollection();
+                foreach($publicationImages as $image){
+                     $collection->add($image);
+                }
+                $publication->setPublicationImages($collection);
+           }
+        }
+
+        return $this->render('feed/index.html.twig', [
+            'allPublications' => $publications,
+        ]);
+    }
+
+    #[Route('/new_publication', name: 'app_new_publication')]
     public function newPublication(Request $request, EntityManagerInterface $entityManager): Response
     {
         $publication = new Publication();
@@ -32,12 +55,42 @@ class FeedController extends AbstractController
             $publication->setTitle($form->get('title')->getData());
             $publication->setContent($form->get('content')->getData());
             $publication->setCreatedAt(new \DateTime());
+
             $entityManager->persist($publication);
             $entityManager->flush();
 
+            $imageFile = $form->get('image')->getData();
+            if($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $saveFilename = $originalFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+                // $safeFilename = $slugger->slug($originalFilename);
+                try {
+                    $imageFile->move(
+                        // $this->getParameter('publication_images_directory'),
+                        $this->getParameter('kernel.project_dir').'/assets/images/publication_images',
+                        $saveFilename
+                    );
+                    $imageObj = new PublicationImages();
+                    $imageObj->setImage($saveFilename);
+                    $imageObj->setTitle($originalFilename);
+                    $imageObj->setCreatedAt(new \DateTime());
+                    $imageObj->setPublicationId($publication);
+                    $entityManager->persist($imageObj);
+                    $entityManager->flush();
+
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during                     // return new Response($e);
+                }
+                
+
+                // $publication->setImageFilename($saveFilename);
+            }
+
+            // var_dump($publication);
+
             return $this->redirectToRoute('app_feed');
         }
-        return $this->render('feed/index.html.twig', [
+        return $this->render('feed/newPublication.html.twig', [
             'newPublicationForm' => $form,
         ]);
     }

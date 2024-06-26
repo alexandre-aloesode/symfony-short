@@ -18,7 +18,7 @@ class Publication
 
     #[ORM\ManyToOne(inversedBy: 'publications')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $user_id = null;
+    private ?User $user = null;
 
     /**
      * @var Collection<int, PublicationComments>
@@ -41,9 +41,6 @@ class Publication
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $url = null;
-
     public function __construct()
     {
         $this->publicationComments = new ArrayCollection();
@@ -57,12 +54,12 @@ class Publication
 
     public function getUserId(): ?User
     {
-        return $this->user_id;
+        return $this->user;
     }
 
-    public function setUserId(?User $user_id): static
+    public function setUserId(?User $user): static
     {
-        $this->user_id = $user_id;
+        $this->user = $user;
 
         return $this;
     }
@@ -103,6 +100,13 @@ class Publication
     public function getPublicationImages(): Collection
     {
         return $this->publicationImages;
+    }
+
+    public function setPublicationImages(Collection $publicationImages): static
+    {
+        $this->publicationImages = $publicationImages;
+
+        return $this;
     }
 
     public function addPublicationImage(PublicationImages $publicationImage): static
@@ -159,18 +163,6 @@ class Publication
     public function setCreatedAt(\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getUrl(): ?string
-    {
-        return $this->url;
-    }
-
-    public function setUrl(?string $url): static
-    {
-        $this->url = $url;
 
         return $this;
     }
