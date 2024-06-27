@@ -41,10 +41,17 @@ class Publication
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
+    /**
+     * @var Collection<int, PublicationReactions>
+     */
+    #[ORM\OneToMany(targetEntity: PublicationReactions::class, mappedBy: 'publication', orphanRemoval: true)]
+    private Collection $publicationReactions;
+
     public function __construct()
     {
         $this->publicationComments = new ArrayCollection();
         $this->publicationImages = new ArrayCollection();
+        $this->publicationReactions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,6 +170,36 @@ class Publication
     public function setCreatedAt(\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PublicationReactions>
+     */
+    public function getPublicationReactions(): Collection
+    {
+        return $this->publicationReactions;
+    }
+
+    public function addPublicationReaction(PublicationReactions $publicationReaction): static
+    {
+        if (!$this->publicationReactions->contains($publicationReaction)) {
+            $this->publicationReactions->add($publicationReaction);
+            $publicationReaction->setPublication($this);
+        }
+
+        return $this;
+    }
+
+    public function removePublicationReaction(PublicationReactions $publicationReaction): static
+    {
+        if ($this->publicationReactions->removeElement($publicationReaction)) {
+            // set the owning side to null (unless already changed)
+            if ($publicationReaction->getPublication() === $this) {
+                $publicationReaction->setPublication(null);
+            }
+        }
 
         return $this;
     }

@@ -19,12 +19,19 @@
 		<div id="feed_scroll">
 			{% for publication in allPublications %}
 				<div class="publication_card">
-					<div class="publication-body">
+					<div class="publication_header">
+						<p class="card-text">{{ publication.userId.email }}</p>
+					</div>
+					<div class="publication_body">
 						<h5 class="card-title">{{ publication.title }}</h5>
 						<p class="card-text">{{ publication.content }}</p>
 					</div>
 					<div class="publication_image_div">
 						<img src="{{ asset('images/publication_images/' ~ publication.publicationImages[0].image) }}" class="publication_image" alt="...">
+					</div>
+					<div class="publication_options">
+						<img src="{{ asset('images/website_images/like.png') }}" class="publication_icon" alt="...">
+						<img src="{{ asset('images/website_images/comment.png') }}" class="publication_icon" alt="...">
 					</div>
 				</div>
 			{% endfor %}

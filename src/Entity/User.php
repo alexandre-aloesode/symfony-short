@@ -50,10 +50,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
+    /**
+     * @var Collection<int, PublicationReactions>
+     */
+    #[ORM\OneToMany(targetEntity: PublicationReactions::class, mappedBy: 'user')]
+    private Collection $publicationReactions;
+
     public function __construct()
     {
         $this->publications = new ArrayCollection();
         $this->publicationComments = new ArrayCollection();
+        $this->publicationReactions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -199,6 +206,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PublicationReactions>
+     */
+    public function getPublicationReactions(): Collection
+    {
+        return $this->publicationReactions;
+    }
+
+    public function addPublicationReaction(PublicationReactions $publicationReaction): static
+    {
+        if (!$this->publicationReactions->contains($publicationReaction)) {
+            $this->publicationReactions->add($publicationReaction);
+            $publicationReaction->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePublicationReaction(PublicationReactions $publicationReaction): static
+    {
+        if ($this->publicationReactions->removeElement($publicationReaction)) {
+            // set the owning side to null (unless already changed)
+            if ($publicationReaction->getUser() === $this) {
+                $publicationReaction->setUser(null);
+            }
+        }
 
         return $this;
     }

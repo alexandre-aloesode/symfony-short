@@ -22,19 +22,22 @@ class FeedController extends AbstractController
 
         $publications = $entityManager->getRepository(Publication::class)->findAll();
 
-        foreach($publications as $publication){
+        foreach ($publications as $publication) {
 
             // $publicationUser = $publication->getUserId();
+            // var_dump($publicationUser);
+            // var_dump($publicationUser->getEmail());
+            // var_dump($publicationUser->getId());
             // $publication->setUserId($publicationUser->getUsername());
-            
+
             $publicationImages = $entityManager->getRepository(PublicationImages::class)->findBy(['publication' => $publication->getId()]);
-           if($publicationImages){
-               $collection = new ArrayCollection();
-                foreach($publicationImages as $image){
-                     $collection->add($image);
+            if ($publicationImages) {
+                $collection = new ArrayCollection();
+                foreach ($publicationImages as $image) {
+                    $collection->add($image);
                 }
                 $publication->setPublicationImages($collection);
-           }
+            }
         }
 
         return $this->render('feed/index.html.twig', [
@@ -60,14 +63,14 @@ class FeedController extends AbstractController
             $entityManager->flush();
 
             $imageFile = $form->get('image')->getData();
-            if($imageFile) {
+            if ($imageFile) {
                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $saveFilename = $originalFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+                $saveFilename = $originalFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
                 // $safeFilename = $slugger->slug($originalFilename);
                 try {
                     $imageFile->move(
                         // $this->getParameter('publication_images_directory'),
-                        $this->getParameter('kernel.project_dir').'/assets/images/publication_images',
+                        $this->getParameter('kernel.project_dir') . '/assets/images/publication_images',
                         $saveFilename
                     );
                     $imageObj = new PublicationImages();
@@ -77,11 +80,10 @@ class FeedController extends AbstractController
                     $imageObj->setPublicationId($publication);
                     $entityManager->persist($imageObj);
                     $entityManager->flush();
-
                 } catch (FileException $e) {
                     // ... handle exception if something happens during                     // return new Response($e);
                 }
-                
+
 
                 // $publication->setImageFilename($saveFilename);
             }
@@ -101,37 +103,37 @@ class FeedController extends AbstractController
     //     if ($this->getUser() == null)
     //         return $this->redirectToRoute('app_login');
 
-        // $client = HttpClient::create();
-        // $response = $client->request(
-        //     'GET',
-        //     // 'https://newsapi.org/v2/everything?q=Apple&from=2024-06-25&sortBy=popularity&apiKey=dacda3723dd945828bd93a04408905a1'
-        //     // 'https://newsapi.org/v2/everything?from=2024-06-24&to=2024-06-24&sortBy=popularity&apiKey=dacda3723dd945828bd93a04408905a1'
-        //     // 'https://newsapi.org/v2/everything?q=Apple&from=2024-06-25&sortBy=popularity&apiKey=dacda3723dd945828bd93a04408905a1'
-        // 'https://newsapi.org/v2/top-headlines?sources=bbc-news&apiKey=dacda3723dd945828bd93a04408905a1'
-        // );
-        // $result = $response->toArray();
-//         if($result['status'] == 'ok' && count($result['articles']) > 0){
-//             $articles = $result['articles'];
-// //I want to store all the articles in the Publication Entity
-//             foreach($articles as $article){
-//                 $publication = new Publication();
-//                 $publication->setTitle($article['title']);
-//                 $publication->setUrl($article['url']);
-//                 $image = new PublicationImages();
-//                 $image->setImage($article['urlToImage']);
-//                 $image->setTitle($article['title']);
-//                 $image->setCreatedAt(new \DateTime($article['publishedAt']));
-//                 $publication->addPublicationImage($image);
-//                 $publication->setCreatedAt(new \DateTime($article['publishedAt']));
-//                 $publication->setContent($article['content']);
-//                 $publication->setUserId($this->getUser());
-//                 // $object = new PublicationController();
+    // $client = HttpClient::create();
+    // $response = $client->request(
+    //     'GET',
+    //     // 'https://newsapi.org/v2/everything?q=Apple&from=2024-06-25&sortBy=popularity&apiKey=dacda3723dd945828bd93a04408905a1'
+    //     // 'https://newsapi.org/v2/everything?from=2024-06-24&to=2024-06-24&sortBy=popularity&apiKey=dacda3723dd945828bd93a04408905a1'
+    //     // 'https://newsapi.org/v2/everything?q=Apple&from=2024-06-25&sortBy=popularity&apiKey=dacda3723dd945828bd93a04408905a1'
+    // 'https://newsapi.org/v2/top-headlines?sources=bbc-news&apiKey=dacda3723dd945828bd93a04408905a1'
+    // );
+    // $result = $response->toArray();
+    //         if($result['status'] == 'ok' && count($result['articles']) > 0){
+    //             $articles = $result['articles'];
+    // //I want to store all the articles in the Publication Entity
+    //             foreach($articles as $article){
+    //                 $publication = new Publication();
+    //                 $publication->setTitle($article['title']);
+    //                 $publication->setUrl($article['url']);
+    //                 $image = new PublicationImages();
+    //                 $image->setImage($article['urlToImage']);
+    //                 $image->setTitle($article['title']);
+    //                 $image->setCreatedAt(new \DateTime($article['publishedAt']));
+    //                 $publication->addPublicationImage($image);
+    //                 $publication->setCreatedAt(new \DateTime($article['publishedAt']));
+    //                 $publication->setContent($article['content']);
+    //                 $publication->setUserId($this->getUser());
+    //                 // $object = new PublicationController();
 
-//             }
-//         }
-        // $articleGetter = new ArticleGetter();
-        // $articles = $articleGetter->getArticles();
-        // var_dump($articles);
+    //             }
+    //         }
+    // $articleGetter = new ArticleGetter();
+    // $articles = $articleGetter->getArticles();
+    // var_dump($articles);
 
     //     return $this->render('feed/index.html.twig', [
     //         'controller_name' => 'FeedController',
