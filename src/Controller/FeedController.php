@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use App\Entity\PublicationImages;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Entity\User;
 
 class FeedController extends AbstractController
 {
@@ -19,7 +20,9 @@ class FeedController extends AbstractController
 
     public function getPublications(EntityManagerInterface $entityManager): Response
     {
+        // $users = $entityManager->getRepository(User::class)->findAll();
 
+        // var_dump($users);
         $publications = $entityManager->getRepository(Publication::class)->findAll();
 
         foreach ($publications as $publication) {
